@@ -15,9 +15,29 @@ const usuarioController = {
     // 🔹 Crear un nuevo usuario
     createUser: async (req, res) => {
         try {
-            const usuarioData = req.body;
-            const fotoBuffer = req.file ? req.file.buffer : null;
+            // Datos del formulario (excepto la imagen)
+            const usuarioData = {
+                tipo_documento: req.body.tipo_documento,
+                numero_documento: req.body.numero_documento,
+                nombre_empleado: req.body.nombre_empleado,
+                direccion: req.body.direccion,
+                telefono: req.body.telefono,
+                email_empleado: req.body.email_empleado,
+                eps: req.body.eps,
+                usuario: req.body.usuario,
+                contrasena: req.body.contrasena,
+                id_cargo: req.body.id_cargo,
+            };
 
+            // Verificar si se recibió la imagen
+            if (!req.file) {
+                throw new Error("No se recibió la imagen.");
+            }
+
+            // Obtener el archivo de imagen
+            const fotoBuffer = req.file.buffer; // Buffer de la imagen
+
+            // Llamar al servicio para crear el usuario
             const nuevoUsuario = await usuarioService.createUser(usuarioData, fotoBuffer);
 
             res.status(201).json({
@@ -25,6 +45,7 @@ const usuarioController = {
                 usuario: nuevoUsuario
             });
         } catch (error) {
+            console.error("❌ Error en createUser:", error);
             res.status(400).json({ error: error.message });
         }
     }
